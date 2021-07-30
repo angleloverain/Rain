@@ -1,0 +1,31 @@
+﻿{
+  "gameName":"航空模拟器2020",
+  "saveDir":"Android/obb/com.aerofly.aeroflyfs2020",
+  "className":"cc.ccplay.activity.WelcomeActivity",
+  "orientation":"HORIZONTAL",
+  "obbs":[
+
+  ],
+
+  "zips": [
+    {
+      "downloadUrl": "http://p3.resource.ccplay.cn/media/packages/2021/07/26/1806-58-591/Android.zip",
+      "totalLength": 18816379,
+      "zipFileName":"Android1.zip",
+      "type": "zip"
+    },
+
+    {
+      "downloadUrl": "http://p3.resource.ccplay.cn/media/packages/2021/07/26/1806-58-591/Android.zip",
+      "totalLength": 18816379,
+      "zipFileName":"Android2.zip",
+      "type": "zip"
+    },
+    {
+      "downloadUrl": "http://p3.resource.ccplay.cn/media/packages/2021/07/26/1806-58-591/Android.zip",
+      "totalLength": 18816379,
+      "zipFileName":"Android3.zip",
+      "type": "zip"
+    }
+  ]
+}

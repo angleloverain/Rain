@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/game_text"
+        android:text="这是反射过来的布局"/>
+
+    <Button
+        android:focusable="true"
+        android:background="@color/black"
+        android:gravity="center"
+        android:id="@+id/btn_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        />
+    <Button
+        android:focusable="true"
+        android:background="@color/black"
+        android:gravity="center"
+        android:id="@+id/start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="新协议启动游戏"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        />
+
+    <Button
+        android:focusable="true"
+        android:background="@color/black"
+        android:gravity="center"
+        android:id="@+id/btn_recon_play_game"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="重连游戏"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        />
+
+    <Button
+        android:focusable="true"
+        android:background="@color/black"
+        android:gravity="center"
+        android:id="@+id/btn_take_play_game"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="接管会话"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:textColor="@color/white" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:id="@+id/game_frame"/>
+
+
+</LinearLayout>
