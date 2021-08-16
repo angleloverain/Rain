@@ -2,17 +2,17 @@ package com.example.rain
 
 import android.Manifest
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.TextView
-
+import com.example.rain.activity.InputActivity
 import com.example.rain.base.BaseActivity
 import com.example.rain.databinding.ActivityMainBinding
-import com.example.rain.game.GameActivity
+import com.example.rain.dlg.InputDialog
 import com.example.rain.model.MyViewModel
+import com.example.rain.utils.PermissionSettingHelper
 
 
 class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
@@ -36,24 +36,31 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         tv = findViewById(R.id.text)
         tv.let { it.setText("jump to game Activity") }
-
         requestPermissions()
-
         layout.text.setOnClickListener(View.OnClickListener {
-
+            InputDialog().show(supportFragmentManager,"input")
+          //  startActivity(Intent(this,InputActivity::class.java))
         })
-
     }
 
 
     private fun requestPermissions(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             var permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            //申请权限
             requestPermissions(permissions, 101)
         }
+    }
+
+    /**
+     * 跳转到权限设置界面
+     */
+    private fun getAppDetailSettingIntent() {
+        val intent = Intent()
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
+        intent.data = Uri.fromParts("package", packageName, null)
+        startActivity(intent)
     }
 }
