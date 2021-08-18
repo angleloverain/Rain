@@ -1,18 +1,19 @@
 package com.example.rain
 
 import android.Manifest
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import com.example.rain.activity.InputActivity
+import androidx.lifecycle.Observer
 import com.example.rain.base.BaseActivity
 import com.example.rain.databinding.ActivityMainBinding
 import com.example.rain.dlg.InputDialog
 import com.example.rain.model.MyViewModel
-import com.example.rain.utils.PermissionSettingHelper
+import com.example.rain.net.retrofit.RetrofitS
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
@@ -41,26 +42,34 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         requestPermissions()
         layout.text.setOnClickListener(View.OnClickListener {
             InputDialog().show(supportFragmentManager,"input")
-          //  startActivity(Intent(this,InputActivity::class.java))
         })
+
+        // 注册监听回调
+        model.getUsers().observe(this, Observer {
+            layout.text.setText(it.name)
+        })
+
+        model.loadData()
+
+        test()
     }
 
+    fun test() {
+        var map: Map<String, String> = HashMap();
+        map.apply {
+            plus(Pair("hell", "hell"))
+            plus(Pair("hell", "hell"))
+            plus(Pair("hell", "hell"))
+        }
+        RetrofitS().POST_BODY("hell",map).enqueue(Callback<String>{
+
+        })
+    }
 
     private fun requestPermissions(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             var permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             requestPermissions(permissions, 101)
         }
-    }
-
-    /**
-     * 跳转到权限设置界面
-     */
-    private fun getAppDetailSettingIntent() {
-        val intent = Intent()
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        intent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
-        intent.data = Uri.fromParts("package", packageName, null)
-        startActivity(intent)
     }
 }

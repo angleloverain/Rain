@@ -157,8 +157,6 @@ public class InputDialog extends DialogFragment {
     }
 
     private void startAnimator(ValueAnimator valueAnimator) {
-        Log.i("dddd", " startAnimator : " +frame_tools.getTop());
-        int original_top = frame_tools.getTop();
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {

@@ -5,8 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.rain.base.BaseViewModel
-import com.example.rain.bean.UserBean
-import kotlin.reflect.KProperty
+import com.example.rain.objectbox.bean.UserBean
 
 class MyViewModel : BaseViewModel() {
 
@@ -21,12 +20,19 @@ class MyViewModel : BaseViewModel() {
          那么数据的初始和获取，在哪里处理，和获取呢？
      */
 
-    private lateinit var users: MutableLiveData<UserBean>
+    // 直接出初始化
+    private var users: MutableLiveData<UserBean> =  MutableLiveData<UserBean>()
 
-    fun getUsers(): LiveData<UserBean> {
+
+    fun getUsers(): MutableLiveData<UserBean> {
         return users
     }
 
-
+    // 提供一个加载数据的方法
+    fun loadData(){
+        var bean = UserBean()
+        bean.name = "view model"
+        users.postValue(bean)
+    }
 
 }

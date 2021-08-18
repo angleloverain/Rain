@@ -9,9 +9,12 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.viewbinding.ViewBinding;
 
 
+import com.example.rain.model.MyViewModel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,6 +57,7 @@ public class BaseActivity<T extends ViewBinding,V extends BaseViewModel> extends
                     e.printStackTrace();
                 }
             }
+
             // 处理ViewModel文件
             if (genericType[1] instanceof Class){
                 String clazz = ((Class<?>) genericType[1]).getName();
