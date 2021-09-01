@@ -94,7 +94,6 @@ public class BaseActivity<T extends ViewBinding,V extends BaseViewModel> extends
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
         // Some permissions have been denied
-
     }
     /* 权限处理 */
 

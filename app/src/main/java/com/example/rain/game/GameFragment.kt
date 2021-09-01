@@ -11,9 +11,6 @@ import com.example.rain.databinding.FragmentGameBinding
 
 class GameFragment : BaseFragment<FragmentGameBinding,BaseViewModel>() {
 
-
-    override fun initView(root: View?, savedInstanceState: Bundle?) {
-
-    }
+    override fun initView(root: View?, savedInstanceState: Bundle?) {}
 
 }

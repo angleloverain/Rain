@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.rain.base.BaseViewModel
 import com.example.rain.objectbox.bean.UserBean
+import kotlinx.coroutines.launch
 
 class MyViewModel : BaseViewModel() {
 
@@ -33,6 +35,7 @@ class MyViewModel : BaseViewModel() {
         var bean = UserBean()
         bean.name = "view model"
         users.postValue(bean)
+
     }
 
 }

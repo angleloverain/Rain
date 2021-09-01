@@ -37,7 +37,6 @@ class GameActivity : BaseActivity<ActivityGameBinding, BaseViewModel>() {
 
             start.setOnClickListener(View.OnClickListener {
                 // 启动新游戏
-
             })
         }
     }
