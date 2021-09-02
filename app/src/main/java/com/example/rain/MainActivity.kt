@@ -20,6 +20,7 @@ import com.example.rain.bean.BaseBean
 import com.example.rain.databinding.ActivityMainBinding
 import com.example.rain.dlg.InputDialog
 import com.example.rain.model.MyViewModel
+import com.example.rain.net.retrofit.RetrofitB
 import com.example.rain.net.retrofit.RetrofitS
 import com.example.rain.objectbox.bean.UserBean
 import kotlinx.coroutines.*
@@ -92,8 +93,10 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         // 这就同步，不能在主线程请求,这里就可以拿到返回结果
         // 但是这里可能会出现IO异常，网络异常，等等问题，需要自己封装，
         // 还是比较麻烦的
+        // 这里是获得json 字符串，还需自己解析，
         var res = RetrofitS.POST_BODY("hell", mapOf(Pair("hell","hell"))).execute()
-
+        // 这里会返回已个BaseBean,最终data数据在字段data里，需要做二次解析
+        var userBean = RetrofitB.POST("hell").execute().body()
     }
 
     // 先学习一下，kotlin的协成使用，然后封装一下，给java代码提供使用
@@ -307,10 +310,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
     // 闭包使用详解
     fun bibao(){
         // 改闭包循环执行三个
-        repeat(3){
-        }
+        repeat(3){}
 
-        var user = BaseBean()
+        var user = BaseBean<UserBean>()
         // 指定T作为闭包的receiver,在函数范围内，可以任意调用该对象的方法，可以返回想返回的对象类型
         with(user){
             code = "000"

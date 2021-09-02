@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rain.base.BaseViewModel
+import com.example.rain.bean.BaseBean
+import com.example.rain.net.retrofit.RetrofitB
 import com.example.rain.objectbox.bean.UserBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
