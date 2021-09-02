@@ -1,5 +1,6 @@
 package com.example.rain.model
 
+import android.renderscript.Sampler
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,6 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rain.base.BaseViewModel
 import com.example.rain.objectbox.bean.UserBean
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class MyViewModel : BaseViewModel() {
@@ -32,9 +38,23 @@ class MyViewModel : BaseViewModel() {
 
     // 提供一个加载数据的方法
     fun loadData(){
-        var bean = UserBean()
-        bean.name = "view model"
-        users.postValue(bean)
+        viewModelScope.launch { // 这里只是开启了协程空间
+            Log.i("dddd","Thread name : " + Thread.currentThread().name)
+            // 在这里执行的协程，还是主线程上，不能进行耗时操作,
+            flow {
+                Log.i("dddd","Thread name 1 : " + Thread.currentThread().name)
+                for (i in 1..3) {
+                    delay(2000)
+                    var user = UserBean();
+                    user.name = "view model$i"
+                    emit(user)  //2.发出数据
+                }
+            }.flowOn(Dispatchers.IO).collect {
+                Log.i("dddd","Thread name 2 : " + Thread.currentThread().name)
+                Log.i("dddd","收集:${it.name}")
+                users.postValue(it)
+            }
+        }
 
     }
 

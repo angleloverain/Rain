@@ -8,6 +8,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.text.style.SuperscriptSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -20,10 +21,15 @@ import com.example.rain.databinding.ActivityMainBinding
 import com.example.rain.dlg.InputDialog
 import com.example.rain.model.MyViewModel
 import com.example.rain.net.retrofit.RetrofitS
+import com.example.rain.objectbox.bean.UserBean
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.flow.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
 class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
 
@@ -73,8 +79,8 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
     fun test() {
     }
 
+    //  Retrofit  要与协程一起使用才会变得简洁和简单
     fun httpTest(){
-
         RetrofitS.POST_BODY("hell", mapOf(Pair("hell","hell"))).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
             }
@@ -82,6 +88,12 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
             override fun onFailure(call: Call<String>, t: Throwable) {
             }
         })
+
+        // 这就同步，不能在主线程请求,这里就可以拿到返回结果
+        // 但是这里可能会出现IO异常，网络异常，等等问题，需要自己封装，
+        // 还是比较麻烦的
+        var res = RetrofitS.POST_BODY("hell", mapOf(Pair("hell","hell"))).execute()
+
     }
 
     // 先学习一下，kotlin的协成使用，然后封装一下，给java代码提供使用
@@ -115,6 +127,8 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         }
     }
 
+    // 使用 launch 不获得到返回值，  async 可以获取到返回，通过 await() 函数得到
+    // 都可以等等待该任务结束，在执行下个一个任务
     fun asyncTest() {
         mScope.launch {
             // 开启一个IO模式的线程 并返回一个Deferred，Deferred可以用来获取返回值
@@ -133,8 +147,106 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         }
     }
 
+    // 协程channel,协程之间的通信使用
+    fun channalTest(){
+        // 这不管有没有接受者，都会发送数据
+        val channel = Channel<Int>()
+        mScope.launch {
+            // 1. 创建 Channel
+            val channel = produce<Int> {
+                for (i in 1..3) {
+                    delay(100)
+                    send(i)//发送数据
+                }
+            }
+
+            // 2. 接收数据
+            launch {
+                for (value in channel) { //for 循环打印接收到的值（直到渠道关闭）
+                    print("接收 $value")
+                }
+            }
+        }
+
+    }
+
+    // 协程flow的使用，
+    fun FlowTest(){
+        // 消费数据
+        // flow的代码块只有调用collected()才开始运行
+        mScope.launch {
+            //1.创建一个Flow
+            flow<Int> {
+                for (i in 1..3) {
+                    delay(200)
+                    emit(i)  //2.发出数据
+                }
+            }.collect {
+                // 当这个方法调用的时候，才开始执行flow闭包，
+                // 所以可以，flow 执行到其他线程，
+                // 让这方法执行到，主线程，那到数据，就更新到UI界面
+                print("收集:$it")
+            }
+        }
+
+        val flow = flow<Int> {
+            for (i in 1..3) {
+                delay(200)
+                emit(i)//从流中发出值
+            }
+        }   // 以下都是上流操作符
+            .filter { true }  // 用于过滤数据，返回一个bool类型
+            .map { }          // 只做相关数据操作，最后返回发送的自己
+            .transform {      // 用转换发送的数据类型，根据相关的逻辑
+                emit("hell")
+            }
+            .flowOn(Dispatchers.IO)  // 通过这个方法，可以切换数据发送线程
+            .onCompletion {}      // 这个方法是数据发送完成回调
+            .conflate()           // 保留最新值,
+            .take(2)        //  限制获取的个数，比如现在是只获取2个
+            .buffer(100)  //  添加缓存，可以存储更多没有处理的数据
+
+        mScope.launch {
+            // 以下就是末端操作符，也就是搜集工作
+            // 且只能在协程中使用
+            flow.collect {} // 基础的末端操作符
+            var sum = flow.reduce{a, b -> a + b}  // 求和（末端操作符）
+            flow.single() // 只发送一个值
+            flow.first()  // 获取发送的第一个值
+            var list = flow.toList() // 获取一个 list 集合
+            var set = flow.toSet()   // 获取一个 set 集合
+        }
+
+        // 这里可以发送 JavaBean 对象
+        val flow2 = flow<UserBean>{
+            // 这里是一个网络请求，是耗时操作
+            // 这flow 执行是在什么时候被执行，走这个代码
+            var call = RetrofitS.POST_BODY("hell", mapOf(Pair("hell","hell"))).execute()
+            if (call.isSuccessful){
+                var name = call.body()
+            }
+            emit(UserBean())
+        }
+
+
+        mScope.async {
+            // 与channel 一样，只能在协程里使用
+            flow.collect {
+                // 在其他协程，消费数据
+            }
+
+            flow.collectLatest{
+                // 用这消费数据，只用最新发送的数据
+            }
+
+            flow2.collect {
+                print(it.age)
+            }
+        }
+    }
+
     // 协程的并发能力
-    fun asyncTest2() {
+    suspend fun asyncTest2() {
         mScope.launch {
             // 此处有一个需求  同时请求5个接口  并且将返回值拼接起来
 
@@ -192,7 +304,61 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         // 作用域取消,将会取消所有工作
         scope.cancel()
     }
+    // 闭包使用详解
+    fun bibao(){
+        // 改闭包循环执行三个
+        repeat(3){
+        }
 
+        var user = BaseBean()
+        // 指定T作为闭包的receiver,在函数范围内，可以任意调用该对象的方法，可以返回想返回的对象类型
+        with(user){
+            code = "000"
+        }
+
+        // 默认当前这个对象作为闭包的it参数，返回值是函数里最后一行或者指定return
+        user.let{
+           it.code = "000"
+        }
+
+        // 调用某对象的apply后，在函数范围内，可以任意调用该对象的方法，返回this
+        var user2 = user.apply{
+            code = "000"
+        }
+
+        // 与apply类似，返回同with，可以返回想返回的对象类型
+        var r = "".run {
+            1
+        }
+
+        // block 最后一行为返回值
+        // 不是extension，执行block，返回block的返回
+        var date = run {
+            Date()
+        }
+
+        // 满足block中的条件，返回this，否则返回null，最后一行返回值需是Boolean类型
+        var end1 = user.takeIf {
+            1 > 2
+        }
+
+        // 与takeIf相反
+        var end2 = user.takeUnless {
+            1 > 2
+        }
+    }
+    // 协程区间使用
+    suspend fun guaqiHans(){
+        // 挂起函数，只能在协程中调用
+        // 只有在挂起函数中，才使用这两个作用域，
+        coroutineScope {
+            // 当其中任何一个job 发生异常，而未捕获的时候，异常会一向上，向下传播，停止整个协程的运行
+        }
+
+        supervisorScope{
+           // 当其中任何一个job 发生异常，而未捕获的时候，异常只会向下传递，并停止当前的工作
+        }
+    }
 
 
     // 这些语法，真的很奇怪
