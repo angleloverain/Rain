@@ -1,13 +1,13 @@
 package com.example.rain.bean;
 
 
-public class BaseBean<T> {
+public class BaseBean {
 
     public long id;
 
     private String code;
     private String msg;
-    private T data;
+    private String data;
 
     public long getId() {
         return id;
@@ -25,10 +25,17 @@ public class BaseBean<T> {
         this.code = code;
     }
 
-
     public String getMsg() { return msg; }
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

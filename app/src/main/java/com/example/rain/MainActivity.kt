@@ -1,20 +1,12 @@
 package com.example.rain
 
 import android.Manifest
-import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.ContentProvider
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
-import android.text.style.SuperscriptSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import com.example.rain.base.BaseActivity
 import com.example.rain.bean.BaseBean
 import com.example.rain.databinding.ActivityMainBinding
@@ -31,6 +23,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import com.example.rain.net.callback.StringCallBack as StringCallBack
 
 class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
 
@@ -76,12 +69,51 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         test()
     }
 
-    // kotlin
+    // kotlin  理解 lambda 到底是如何玩的
+    // 还有高阶函数没能搞懂
     fun test() {
     }
 
+    fun hell(a :Int,b : Int) : Int{
+        return a+b
+    }
+
+    fun gaoJieHanSuTest(){
+
+        val sum : (Int, Int) -> Int = { x: Int, y: Int -> x + y }
+
+        val sum1 = { x: Int, y: Int -> x + y }
+
+        val sum2 = { x: Int, y: Int, z : Int -> x + y + z}
+
+        var items = listOf(1,2,3)
+        // 在 Kotlin 中有一个约定：如果函数的最后一个参数是函数，那么作为相应参数传入的 lambda 表达式可以放在圆括号之外
+        // fold 函数，第一个参数为初始的第一个值
+        val product = items.fold(1) { abb, c -> abb * c }
+
+        myFold(5){a,b -> a + b}
+        myFold(5){a,b -> hell(a,b)}
+    }
+
+    public fun <R> myFold(initial: R,method :(a:R,R) -> R) : R{
+        // 这里是传入一个简单的方法，或者一个lambda表达式
+        // 然后处理这个方法中的，内部数据，然后给出，相应的结果
+        var ok = method(initial,initial) // 这里类型不确定，很多操作都搞不了
+        return initial
+    }
+
+     fun onResponse(call: Call<String>, response: Response<String>) {
+         Log.i("dddd","回调成功方法 ： " + response.body())
+    }
+
+     fun onFailure(call: Call<String>, t: Throwable) {
+
+    }
+
+
     //  Retrofit  要与协程一起使用才会变得简洁和简单
     fun httpTest(){
+
         RetrofitS.POST_BODY("hell", mapOf(Pair("hell","hell"))).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
             }
@@ -89,6 +121,10 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
             override fun onFailure(call: Call<String>, t: Throwable) {
             }
         })
+
+        // 运用回调方式，就进行请求，就特么的麻烦
+        RetrofitS.POST_BODY("hell", mapOf(Pair("hell","hell"))).enqueue(
+            StringCallBack({a,b -> onResponse(a,b)},{a,b -> onFailure(a,b)}))
 
         // 这就同步，不能在主线程请求,这里就可以拿到返回结果
         // 但是这里可能会出现IO异常，网络异常，等等问题，需要自己封装，
@@ -98,7 +134,6 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         // 这里会返回已个BaseBean,最终data数据在字段data里，需要做二次解析
         var userBean = RetrofitB.POST("hell").execute().body()
     }
-
     // 先学习一下，kotlin的协成使用，然后封装一下，给java代码提供使用
     fun fetchDocs() {
         val job1 = mScope.launch {
@@ -202,6 +237,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
             .map { }          // 只做相关数据操作，最后返回发送的自己
             .transform {      // 用转换发送的数据类型，根据相关的逻辑
                 emit("hell")
+            }
+            .catch {
+                // 在这里可以捕获Flow的异常
             }
             .flowOn(Dispatchers.IO)  // 通过这个方法，可以切换数据发送线程
             .onCompletion {}      // 这个方法是数据发送完成回调
@@ -312,7 +350,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         // 改闭包循环执行三个
         repeat(3){}
 
-        var user = BaseBean<UserBean>()
+        var user = BaseBean()
         // 指定T作为闭包的receiver,在函数范围内，可以任意调用该对象的方法，可以返回想返回的对象类型
         with(user){
             code = "000"
@@ -361,7 +399,6 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
            // 当其中任何一个job 发生异常，而未捕获的时候，异常只会向下传递，并停止当前的工作
         }
     }
-
 
     // 这些语法，真的很奇怪
     suspend fun get(url: String) : Int{

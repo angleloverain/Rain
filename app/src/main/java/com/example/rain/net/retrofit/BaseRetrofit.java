@@ -4,6 +4,7 @@ package com.example.rain.net.retrofit;
 import android.annotation.SuppressLint;
 
 import com.example.rain.BuildConfig;
+import com.example.rain.net.MockInterceptor;
 import com.example.rain.net.call.BaseRequest;
 
 import java.io.EOFException;
@@ -44,6 +45,7 @@ public class BaseRetrofit {
                 .hostnameVerifier(new TrustAllHostnameVerifier());//trust all?信任所有host
         if (BuildConfig.DEBUG){
             builder.addInterceptor(new LoggingInterceptor());
+            builder.addInterceptor(new MockInterceptor());
         }
         return builder.build();
     }

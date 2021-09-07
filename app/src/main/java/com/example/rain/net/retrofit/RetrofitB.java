@@ -4,6 +4,7 @@ package com.example.rain.net.retrofit;
 
 import com.example.rain.bean.BaseBean;
 import com.example.rain.net.call.BeanRequest;
+import com.example.rain.objectbox.bean.UserBean;
 
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class RetrofitB extends BaseRetrofit {
@@ -21,7 +23,7 @@ public class RetrofitB extends BaseRetrofit {
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://os.zhijierongxing.com")
                 .client(initClient())
-                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
         call = retrofit.create(BeanRequest.class);
     }
@@ -38,7 +40,7 @@ public class RetrofitB extends BaseRetrofit {
         return call.GET_PART(path,params);
     }
 
-    public static Call<BaseBean>  POST(String path){
+    public static Call<BaseBean> POST(String path){
         return call.POST(path);
     }
 

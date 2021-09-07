@@ -96,5 +96,4 @@ public class BaseActivity<T extends ViewBinding,V extends BaseViewModel> extends
         // Some permissions have been denied
     }
     /* 权限处理 */
-
 }
