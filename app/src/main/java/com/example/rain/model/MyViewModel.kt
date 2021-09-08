@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.alibaba.fastjson.JSON
+import com.example.rain.TickHandler
 import com.example.rain.base.BaseViewModel
 import com.example.rain.bean.BaseBean
 import com.example.rain.net.retrofit.RetrofitB
 import com.example.rain.objectbox.bean.UserBean
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -28,6 +30,12 @@ class MyViewModel : BaseViewModel<String>() {
 
     // 直接出初始化 liveData
     private var users: MutableLiveData<UserBean> =  MutableLiveData<UserBean>()
+
+    // 默认值为 0,必须得有初始值
+    var uiState = MutableStateFlow<Int>(0)
+
+    var handler = TickHandler(viewModelScope)
+
 
     // 直接初始化 stateFlow
     private var selected = MutableStateFlow(false)
@@ -64,12 +72,9 @@ class MyViewModel : BaseViewModel<String>() {
                 Log.i("dddd","Thread name 2 : " + Thread.currentThread().name)
                 Log.i("dddd","收集:${it.name}")
                 users.postValue(it)
+                uiState.value = 10
             }
 
-            selected.collect{
-                // 这里是主线程
-                // 修改UI的变化，
-            }
 
 
             flow<LatestNewsUiState> { // 这个是在子线程工作
@@ -94,9 +99,6 @@ class MyViewModel : BaseViewModel<String>() {
 
     }
 
-    val uiState = MutableStateFlow(LatestNewsUiState.Success(emptyList()))
-
-    // Represents different states for the LatestNews screen
     // 这实际上就是一个枚举内型
     sealed class LatestNewsUiState {
         data class Success(var news: List<BaseBean>): LatestNewsUiState()

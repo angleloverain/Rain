@@ -8,8 +8,9 @@ import com.example.rain.R
 import com.example.rain.base.BaseActivity
 import com.example.rain.base.BaseViewModel
 import com.example.rain.databinding.ActivityGameBinding
+import com.example.rain.model.MyViewModel
 
-class GameActivity : BaseActivity<ActivityGameBinding, BaseViewModel>() {
+class GameActivity : BaseActivity<ActivityGameBinding, MyViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

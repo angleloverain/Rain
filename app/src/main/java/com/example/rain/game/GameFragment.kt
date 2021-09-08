@@ -8,9 +8,8 @@ import android.view.ViewGroup
 import com.example.rain.base.BaseFragment
 import com.example.rain.base.BaseViewModel
 import com.example.rain.databinding.FragmentGameBinding
+import com.example.rain.model.MyViewModel
 
-class GameFragment : BaseFragment<FragmentGameBinding,BaseViewModel>() {
-
+class GameFragment : BaseFragment<FragmentGameBinding,MyViewModel>() {
     override fun initView(root: View?, savedInstanceState: Bundle?) {}
-
 }

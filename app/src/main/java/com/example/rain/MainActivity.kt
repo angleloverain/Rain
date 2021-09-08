@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.rain.base.BaseActivity
 import com.example.rain.bean.BaseBean
 import com.example.rain.databinding.ActivityMainBinding
@@ -59,12 +62,21 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
         })
 
 
-        // 注册监听回调
+        // 使用 livedata 进行注册回调
         model.getUsers().observe(this, Observer {
             layout.text.setText(it.name)
         })
 
         model.loadData()
+
+        // 使用 stateflow 热数据流回调
+        lifecycleScope.launch { // 这方法在 协程库2.4.0 以上才能用
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                model.uiState.collect {
+                    Log.i("dddd","stateFlow int1 : " + it)
+                }
+            }
+        }
 
         test()
     }
@@ -72,6 +84,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
     // kotlin  理解 lambda 到底是如何玩的
     // 还有高阶函数没能搞懂
     fun test() {
+
     }
 
     fun hell(a :Int,b : Int) : Int{
