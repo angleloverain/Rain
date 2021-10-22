@@ -20,11 +20,23 @@ class TickHandler(
     )
 
     init {
+        // 这里代码块，会在创建该类之后执行
         externalScope.launch {
             while(true) {
                 sharedFlow.emit(testint++)
                 delay(tickIntervalMs)
             }
         }
+    }
+
+    companion object {
+
+        init {
+            // 这里的代码，会在创建该类之前执行
+        }
+
+        // 在这里面，就类似，java 的静态块
+        fun hell(){}
+        var index = 5
     }
 }

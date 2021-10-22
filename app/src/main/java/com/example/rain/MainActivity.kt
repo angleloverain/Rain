@@ -83,13 +83,10 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
 
     // kotlin  理解 lambda 到底是如何玩的
     // 还有高阶函数没能搞懂
-    fun test() {
-
-    }
+    fun test() {}
 
     fun hell(a :Int,b : Int) : Int{
-        return a+b
-    }
+        return a+b }
 
     fun gaoJieHanSuTest(){
 
@@ -250,11 +247,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MyViewModel>(){
             .map { }          // 只做相关数据操作，最后返回发送的自己
             .transform {      // 用转换发送的数据类型，根据相关的逻辑
                 emit("hell")
-            }
-            .catch {
+            }.catch {
                 // 在这里可以捕获Flow的异常
-            }
-            .flowOn(Dispatchers.IO)  // 通过这个方法，可以切换数据发送线程
+            }.flowOn(Dispatchers.IO)  // 通过这个方法，可以切换数据发送线程
             .onCompletion {}      // 这个方法是数据发送完成回调
             .conflate()           // 保留最新值,
             .take(2)        //  限制获取的个数，比如现在是只获取2个
